@@ -68,10 +68,14 @@ output "hostnames" {
   value = ["${vultr_server.hosts.*.name}"]
 }
 
-output "public_ipv4" {
+output "private_ipv4s" {
+  value = ["${dnsimple_record.hosts.*.value}"]
+}
+
+output "public_ipv4s" {
   value = ["${vultr_server.hosts.*.ipv4_address}"]
 }
 
-output "public_ipv6" {
+output "public_ipv6s" {
   value = ["${vultr_server.hosts.*.ipv6_address}"]
 }

@@ -6,3 +6,12 @@ module "inventory" {
   domain_name = "${var.domain_name}"
   tag = "${var.hosts_tag}"
 }
+
+module "wireguard" {
+  source = "./base/wireguard"
+
+  connections = "${module.inventory.public_ipv4s}"
+  private_ipv4s = "${module.inventory.private_ipv4s}"
+  vpn_interface = "wg0"
+  vpn_port = "45769"
+}
