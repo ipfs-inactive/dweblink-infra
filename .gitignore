@@ -1,3 +1,6 @@
+secrets.tf
+.terraform
+
 # Compiled files
 *.tfstate
 *.tfstate.backup
