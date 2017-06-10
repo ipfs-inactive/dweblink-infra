@@ -1,0 +1,4 @@
+job "gateway" {
+  task "ipfs" {
+  }
+}
