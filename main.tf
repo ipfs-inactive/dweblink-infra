@@ -6,3 +6,13 @@ module "inventory" {
   domain_name = "${var.domain_name}"
   tag = "${var.hosts_tag}"
 }
+
+module "wireguard" {
+  source = "./base/wireguard"
+
+  connections = "${module.inventory.public_ipv4s}"
+  listen_addrs = "${module.inventory.public_ipv4s}"
+  listen_port = 51820
+  interface = "wg0"
+  private_ipv4s = "${module.inventory.private_ipv4s}"
+}
