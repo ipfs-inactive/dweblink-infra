@@ -16,3 +16,9 @@ module "wireguard" {
   interface = "wg0"
   private_ipv4s = "${module.inventory.private_ipv4s}"
 }
+
+module "docker" {
+  source = "./base/docker"
+
+  connections = "${module.inventory.public_ipv4s}"
+}
