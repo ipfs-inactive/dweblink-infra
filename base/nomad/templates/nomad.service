@@ -1,0 +1,12 @@
+[Unit]
+Description=Nomad
+Documentation=https://nomadproject.io/docs/
+
+[Service]
+ExecStart=${command}
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -55,6 +55,22 @@ resource "vultr_server" "hosts" {
   ssh_key_ids        = ["${vultr_ssh_key.hosts.*.id}"]
 }
 
+resource "null_resource" "tools" {
+  count = "${length(var.hosts)}"
+
+  connection {
+    host = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
+    user = "root"
+    agent = true
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yq vim screen gdb tree iftop sysstat bridge-utils unzip jq mtr traceroute dnsutils psmisc",
+    ]
+  }
+}
+
 resource "dnsimple_record" "hostnames" {
   count  = "${length(var.hosts)}"
   domain = "${var.domain_name}"
@@ -70,6 +86,15 @@ data "template_file" "datacenters" {
 
   vars {
     dc = "${lookup(var.hosts[count.index], "dc")}"
+  }
+}
+
+data "template_file" "roles" {
+  count = "${length(var.hosts)}"
+  template = "$${role}"
+
+  vars {
+    role = "${lookup(var.hosts[count.index], "role")}"
   }
 }
 
@@ -91,4 +116,8 @@ output "public_ipv6s" {
 
 output "datacenters" {
   value = ["${data.template_file.datacenters.*.rendered}"]
+}
+
+output "roles" {
+  value = ["${data.template_file.roles.*.rendered}"]
 }
