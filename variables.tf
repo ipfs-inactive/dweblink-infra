@@ -6,6 +6,14 @@ variable "hosts_tag" {
   default = "protocollabs"
 }
 
+variable "coordinators" {
+  default = [
+    "10.42.1.10",
+    "10.42.2.10",
+    "10.42.3.10",
+  ]
+}
+
 variable "hosts" {
   default = [
     { hostname = "vpn0.ams", dc = "ams", private_ipv4 = "10.42.1.1", role = "vpn", vultr_name = "ipfs-ams-vpn0", vultr_plan = 201 },

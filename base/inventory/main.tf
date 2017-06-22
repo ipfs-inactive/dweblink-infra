@@ -64,6 +64,15 @@ resource "dnsimple_record" "hostnames" {
   ttl   = "60"
 }
 
+data "template_file" "datacenters" {
+  count = "${length(var.hosts)}"
+  template = "$${dc}"
+
+  vars {
+    dc = "${lookup(var.hosts[count.index], "dc")}"
+  }
+}
+
 output "hostnames" {
   value = ["${vultr_server.hosts.*.name}"]
 }
@@ -78,4 +87,8 @@ output "public_ipv4s" {
 
 output "public_ipv6s" {
   value = ["${vultr_server.hosts.*.ipv6_address}"]
+}
+
+output "datacenters" {
+  value = ["${data.template_file.datacenters.*.rendered}"]
 }

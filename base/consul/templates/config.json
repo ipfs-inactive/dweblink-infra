@@ -1,0 +1,7 @@
+{
+  "bind_addr": "${bind}",
+  "server": ${server},
+  "retry_join": ["${retry_join}"],
+  "bootstrap_expect": ${bootstrap_expect},
+  "datacenter": "dc1"
+}
