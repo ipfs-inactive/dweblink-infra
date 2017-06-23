@@ -89,6 +89,15 @@ data "template_file" "datacenters" {
   }
 }
 
+data "template_file" "roles" {
+  count = "${length(var.hosts)}"
+  template = "$${role}"
+
+  vars {
+    role = "${lookup(var.hosts[count.index], "role")}"
+  }
+}
+
 output "hostnames" {
   value = ["${vultr_server.hosts.*.name}"]
 }
@@ -107,4 +116,8 @@ output "public_ipv6s" {
 
 output "datacenters" {
   value = ["${data.template_file.datacenters.*.rendered}"]
+}
+
+output "roles" {
+  value = ["${data.template_file.roles.*.rendered}"]
 }
