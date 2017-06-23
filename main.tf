@@ -36,3 +36,14 @@ module "consul" {
   servers = "${var.coordinators}"
   datacenters = "${module.inventory.datacenters}"
 }
+
+module "nomad" {
+  source = "./base/nomad"
+
+  connections = "${module.inventory.public_ipv4s}"
+  private_ipv4s = "${module.inventory.private_ipv4s}"
+  nomad_version = "0.5.6"
+  servers = "${var.coordinators}"
+  datacenters = "${module.inventory.datacenters}"
+  roles = "${module.inventory.roles}"
+}

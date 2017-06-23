@@ -1,0 +1,26 @@
+{
+  "data_dir": "${data_dir}",
+  "addresses": {
+    "http": "${http_address}",
+    "rpc": "${rpc_address}",
+    "serf": "${serf_address}"
+  },
+  "advertise": {
+    "http": "${http_address}:4646",
+    "rpc": "${rpc_address}:4647",
+    "serf": "${serf_address}:4648"
+  },
+  "datacenter": "${datacenter}",
+  "server": {
+    "enabled": ${server},
+    "bootstrap_expect": ${bootstrap_expect}
+  },
+  "client": {
+    "enabled": ${client},
+    "options": {
+      "driver.whitelist": "${drivers}"
+    }
+    "node_class": "${node_class}",
+    "reserved": null,
+  }
+}
