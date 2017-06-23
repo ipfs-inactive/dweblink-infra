@@ -2,6 +2,10 @@ variable "depends_on" {
   default = []
 }
 
+variable "connections_length" {
+  type = "string"
+}
+
 variable "connections" {
   type = "list"
 }
@@ -35,7 +39,7 @@ variable "config_dir" {
 }
 
 resource "null_resource" "prepare" {
-  count = "${length(var.connections)}"
+  count = "${var.connections_length}"
 
   triggers {
     conf = "${element(data.template_file.config.*.rendered, count.index)}"
@@ -67,7 +71,7 @@ resource "null_resource" "prepare" {
 }
 
 data "template_file" "config" {
-  count = "${length(var.connections)}"
+  count = "${var.connections_length}"
   template = "${file("${path.module}/templates/config.json")}"
 
   vars {
