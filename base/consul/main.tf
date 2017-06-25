@@ -2,7 +2,7 @@ variable "depends_on" {
   default = []
 }
 
-variable "connections_length" {
+variable "count" {
   type = "string"
 }
 
@@ -39,7 +39,7 @@ variable "config_dir" {
 }
 
 resource "null_resource" "prepare" {
-  count = "${var.connections_length}"
+  count = "${var.count}"
 
   triggers {
     conf = "${element(data.template_file.config.*.rendered, count.index)}"
@@ -72,7 +72,7 @@ resource "null_resource" "prepare" {
 }
 
 data "template_file" "config" {
-  count = "${var.connections_length}"
+  count = "${var.count}"
   template = "${file("${path.module}/templates/config.json")}"
 
   vars {

@@ -1,4 +1,4 @@
-variable "connections_length" {
+variable "count" {
   type = "string"
 }
 
@@ -23,12 +23,12 @@ variable "private_ipv4s" {
 }
 
 resource "null_resource" "wireguard" {
-  count = "${var.connections_length}"
+  count = "${var.count}"
 
   triggers {
     # TODO this generates new keys everytime :/
     # interface_conf = "${join("\n\n", data.template_file.interface.*.rendered)}"
-    count = "${var.connections_length}"
+    count = "${var.count}"
   }
 
   connection {
@@ -71,7 +71,7 @@ resource "null_resource" "wireguard" {
 }
 
 data "template_file" "interface" {
-  count    = "${var.connections_length}"
+  count    = "${var.count}"
   template = "${file("${path.module}/templates/interface.conf")}"
 
   vars {
@@ -83,7 +83,7 @@ data "template_file" "interface" {
 }
 
 data "template_file" "peers" {
-  count    = "${var.connections_length}"
+  count    = "${var.count}"
   template = "${file("${path.module}/templates/peer.conf")}"
 
   vars {
@@ -94,7 +94,7 @@ data "template_file" "peers" {
 }
 
 data "external" "keys" {
-  count = "${var.connections_length}"
+  count = "${var.count}"
 
   program = ["sh", "${path.module}/scripts/gen_keys.sh"]
 }

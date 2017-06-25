@@ -10,7 +10,7 @@ module "inventory" {
 module "wireguard" {
   source = "./base/wireguard"
 
-  connections_length = "${length(var.hosts)}"
+  count = "${length(var.hosts)}"
   connections = "${module.inventory.public_ipv4s}"
   listen_addrs = "${module.inventory.public_ipv4s}"
   listen_port = 51820
@@ -21,7 +21,7 @@ module "wireguard" {
 module "docker" {
   source = "./base/docker"
 
-  connections_length = "${length(var.hosts)}"
+  count = "${length(var.hosts)}"
   connections = "${module.inventory.public_ipv4s}"
 }
 
@@ -29,7 +29,7 @@ module "consul" {
   source = "./base/consul"
   depends_on = ["${module.docker.dependency}"]
 
-  connections_length = "${length(var.hosts)}"
+  count = "${length(var.hosts)}"
   connections = "${module.inventory.public_ipv4s}"
   private_ipv4s = "${module.inventory.private_ipv4s}"
   docker_image = "consul:0.8.4"
@@ -40,6 +40,7 @@ module "consul" {
 module "nomad" {
   source = "./base/nomad"
 
+  count = "${length(var.hosts)}"
   connections = "${module.inventory.public_ipv4s}"
   private_ipv4s = "${module.inventory.private_ipv4s}"
   nomad_version = "0.5.6"

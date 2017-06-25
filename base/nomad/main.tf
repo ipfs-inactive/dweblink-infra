@@ -1,3 +1,7 @@
+variable "count" {
+  type = "string"
+}
+
 variable "connections" {
   type = "list"
 }
@@ -31,7 +35,7 @@ variable "config_dir" {
 }
 
 resource "null_resource" "install" {
-  count = "${length(var.connections)}"
+  count = "${var.count}"
 
   triggers {
     conf = "${element(data.template_file.config.*.rendered, count.index)}"
@@ -74,7 +78,7 @@ resource "null_resource" "install" {
 }
 
 data "template_file" "config" {
-  count = "${length(var.connections)}"
+  count = "${var.count}"
   template = "${file("${path.module}/templates/config.json")}"
 
   vars {

@@ -1,4 +1,4 @@
-variable "connections_length" {
+variable "count" {
   type = "string"
 }
 
@@ -7,7 +7,7 @@ variable "connections" {
 }
 
 resource "null_resource" "install" {
-  count = "${var.connections_length}"
+  count = "${var.count}"
 
   connection {
     host = "${element(var.connections, count.index)}"
