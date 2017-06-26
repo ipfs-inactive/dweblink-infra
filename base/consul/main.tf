@@ -38,7 +38,7 @@ variable "config_dir" {
   default = "/opt/consul/config"
 }
 
-resource "null_resource" "prepare" {
+resource "null_resource" "install" {
   count = "${var.count}"
 
   triggers {
@@ -67,7 +67,7 @@ resource "null_resource" "prepare" {
   provisioner "remote-exec" {
     inline = [
       "docker stop consul && docker rm consul",
-      "docker run -d --name=consul --net=host -v ${var.config_dir}:/consul/config -v ${var.data_dir}:/consul/data ${var.docker_opts} ${var.docker_image} agent -config-dir=/consul/config -data-dir=/consul/data",
+      "docker run -d --name=consul --net=host -v ${var.config_dir}:/consul/config -v ${var.data_dir}:/consul/data ${var.docker_opts} ${var.docker_image} agent",
     ]
   }
 }
