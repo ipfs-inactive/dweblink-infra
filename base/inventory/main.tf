@@ -66,7 +66,8 @@ resource "null_resource" "tools" {
 
   provisioner "remote-exec" {
     inline = [
-      "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yq vim screen gdb tree iftop sysstat bridge-utils unzip jq mtr traceroute dnsutils psmisc",
+      "apt-get update -q",
+      "DEBIAN_FRONTEND=noninteractive apt-get install -yq vim screen gdb tree iftop sysstat bridge-utils unzip jq mtr traceroute dnsutils psmisc build-essential",
     ]
   }
 }

@@ -28,7 +28,8 @@ resource "null_resource" "install" {
     inline = [
       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -",
       "echo 'deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial edge' > /etc/apt/sources.list.d/docker.list",
-      "apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -yq docker-ce libltdl7",
+      "apt-get update -q",
+      "DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::=\"--force-confold\" install -yq docker-ce libltdl7",
       "systemctl daemon-reload",
       "systemctl is-enabled docker.service || systemctl enable docker.service",
       "systemctl start docker.service",

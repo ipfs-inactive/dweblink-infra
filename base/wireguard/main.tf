@@ -43,9 +43,9 @@ resource "null_resource" "wireguard" {
 
   provisioner "remote-exec" {
     inline = [
-      "apt-get install -yq software-properties-common python-software-properties build-essential",
+      "DEBIAN_FRONTEND=noninteractive apt-get install -yq software-properties-common python-software-properties build-essential",
       "add-apt-repository -y ppa:wireguard/wireguard",
-      "apt-get update",
+      "apt-get update -q",
       "DEBIAN_FRONTEND=noninteractive apt-get install -yq wireguard-dkms wireguard-tools",
     ]
   }
