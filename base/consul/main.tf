@@ -1,5 +1,5 @@
 variable "depends_on" {
-  default = []
+  default = ""
 }
 
 variable "count" {
@@ -42,8 +42,9 @@ resource "null_resource" "prepare" {
   count = "${var.count}"
 
   triggers {
-    conf = "${element(data.template_file.config.*.rendered, count.index)}"
+    conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
     docker = "${var.docker_image} ${var.docker_opts}"
+    depends_on = "${var.depends_on}"
   }
 
   connection {

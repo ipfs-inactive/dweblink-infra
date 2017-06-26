@@ -38,8 +38,8 @@ resource "null_resource" "install" {
   count = "${var.count}"
 
   triggers {
-    conf = "${element(data.template_file.config.*.rendered, count.index)}"
-    service = "${element(data.template_file.service.*.rendered, count.index)}"
+    conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
+    service = "${sha256(element(data.template_file.service.*.rendered, count.index))}"
     version = "${var.nomad_version}"
   }
 
@@ -98,7 +98,7 @@ data "template_file" "config" {
 }
 
 data "template_file" "service" {
-  count = "${length(var.connections)}"
+  count = "${var.count}"
   template = "${file("${path.module}/templates/nomad.service")}"
 
   vars {

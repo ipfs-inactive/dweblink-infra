@@ -99,6 +99,10 @@ data "external" "keys" {
   program = ["sh", "${path.module}/scripts/gen_keys.sh"]
 }
 
+output "private_ipv4s" {
+  value = ["${var.private_ipv4s}"]
+}
+
 output "vpn_unit" {
   depends_on = ["null_resource.wireguard"]
   value      = "wireguard@${var.interface}.service"

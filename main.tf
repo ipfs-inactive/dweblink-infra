@@ -27,11 +27,11 @@ module "docker" {
 
 module "consul" {
   source = "./base/consul"
-  depends_on = ["${module.docker.dependency}"]
+  depends_on = "${module.docker.dependency}"
 
   count = "${length(var.hosts)}"
   connections = "${module.inventory.public_ipv4s}"
-  private_ipv4s = "${module.inventory.private_ipv4s}"
+  private_ipv4s = "${module.wireguard.private_ipv4s}"
   docker_image = "consul:0.8.4"
   servers = "${var.coordinators}"
   datacenters = "${module.inventory.datacenters}"
@@ -42,7 +42,7 @@ module "nomad" {
 
   count = "${length(var.hosts)}"
   connections = "${module.inventory.public_ipv4s}"
-  private_ipv4s = "${module.inventory.private_ipv4s}"
+  private_ipv4s = "${module.wireguard.private_ipv4s}"
   nomad_version = "0.5.6"
   servers = "${var.coordinators}"
   datacenters = "${module.inventory.datacenters}"

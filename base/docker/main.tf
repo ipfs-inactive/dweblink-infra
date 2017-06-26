@@ -9,6 +9,10 @@ variable "connections" {
 resource "null_resource" "install" {
   count = "${var.count}"
 
+  triggers {
+    conf = "${sha256(file("${path.module}/templates/docker.default"))}"
+  }
+
   connection {
     host = "${element(var.connections, count.index)}"
     user = "root"
@@ -33,5 +37,5 @@ resource "null_resource" "install" {
 }
 
 output "dependency" {
-  value = "${null_resource.install.id}"
+  value = "${sha256(var.count)}"
 }
