@@ -66,6 +66,8 @@ resource "null_resource" "wireguard" {
       "systemctl daemon-reload",
       "systemctl is-enabled wireguard@${var.interface}.service || systemctl enable wireguard@${var.interface}.service",
       "systemctl restart wireguard@${var.interface}.service",
+      "ufw allow from any to ${element(var.connections, count.index)} port ${var.listen_port} proto udp",
+      "ufw allow from 10.42.0.0/16",
     ]
   }
 }

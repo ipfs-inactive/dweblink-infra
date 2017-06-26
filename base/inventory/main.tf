@@ -72,6 +72,25 @@ resource "null_resource" "tools" {
   }
 }
 
+resource "null_resource" "firewall" {
+  count = "${length(var.hosts)}"
+
+  connection {
+    host = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
+    user = "root"
+    agent = true
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "echo y | ufw reset && echo y | ufw enable",
+      "ufw default deny incoming && ufw default allow outgoing",
+      "ufw allow from any to ${element(vultr_server.hosts.*.ipv4_address, count.index)} port 22 proto tcp",
+      "ufw logging on",
+    ]
+  }
+}
+
 resource "dnsimple_record" "hostnames" {
   count  = "${length(var.hosts)}"
   domain = "${var.domain_name}"
