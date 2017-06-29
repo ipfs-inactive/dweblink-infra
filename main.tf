@@ -4,6 +4,7 @@ module "inventory" {
   hosts = "${var.hosts}"
   ssh_keys = "${var.ssh_keys}"
   domain_name = "${var.domain_name}"
+  image = "${var.image}"
   tag = "${var.hosts_tag}"
 }
 

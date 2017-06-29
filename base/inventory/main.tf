@@ -18,6 +18,22 @@ variable "dc2region" {
   }
 }
 
+variable "size2plan" {
+  default = {
+    "1cpu1gb" = 201,
+    "1cpu2gb" = 202,
+    "2cpu4gb" = 203,
+    "4cpu8gb" = 204,
+  }
+}
+
+variable "image2os" {
+  default = {
+    ubuntu1604 = 215,
+    windows2016 = 240,
+  }
+}
+
 variable "hosts" {
   type = "list"
 }
@@ -27,6 +43,10 @@ variable "ssh_keys" {
 }
 
 variable "domain_name" {
+  type = "string"
+}
+
+variable "image" {
   type = "string"
 }
 
@@ -42,12 +62,12 @@ resource "vultr_ssh_key" "hosts" {
 
 resource "vultr_server" "hosts" {
   count = "${length(var.hosts)}"
-  name  = "${lookup(var.hosts[count.index], "vultr_name")}"
+  name  = "${lookup(var.hosts[count.index], "hostname")}.${var.domain_name}"
   tag   = "${var.tag}"
 
   region_id = "${var.dc2region[lookup(var.hosts[count.index], "dc")]}"
-  plan_id   = "${lookup(var.hosts[count.index], "vultr_plan")}"
-  os_id     = 215
+  plan_id   = "${var.size2plan[lookup(var.hosts[count.index], "size")]}"
+  os_id     = "${var.image2os[var.image]}"
 
   hostname           = "${lookup(var.hosts[count.index], "hostname")}.${var.domain_name}"
   ipv6               = true
