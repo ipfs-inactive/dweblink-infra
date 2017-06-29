@@ -67,7 +67,7 @@ resource "null_resource" "install" {
 
   provisioner "remote-exec" {
     inline = [
-      "DEBIAN_FRONTEND=noninteractive apt-get install -yq unzip ethtool",
+      "DEBIAN_FRONTEND=noninteractive apt-get install -yq ethtool",
       "cd /tmp && wget https://releases.hashicorp.com/nomad/${var.nomad_version}/nomad_${var.nomad_version}_linux_amd64.zip && unzip nomad_${var.nomad_version}_linux_amd64.zip",
       "mv /tmp/nomad /usr/local/bin/",
       "systemctl daemon-reload",
