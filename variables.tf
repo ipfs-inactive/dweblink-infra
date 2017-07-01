@@ -45,9 +45,8 @@ variable "hosts" {
 
 variable "ssh_keys" {
   default = [
-    {
-      name = "lars-desktop"
-      public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGjmBIHEnVszhvtgdD0RbiSK9+h+n1zCHQFVKrN5EVD6"
-    }
+    "57d1b92cd1edd",
+    "5956dc8a4967d",
+    "5956dcad57069",
   ]
 }

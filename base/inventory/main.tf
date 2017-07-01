@@ -54,12 +54,6 @@ variable "tag" {
   type = "string"
 }
 
-resource "vultr_ssh_key" "hosts" {
-  count = "${length(var.ssh_keys)}"
-  name       = "${lookup(var.ssh_keys[count.index], "name")}"
-  public_key = "${lookup(var.ssh_keys[count.index], "public_key")}"
-}
-
 resource "vultr_server" "hosts" {
   count = "${length(var.hosts)}"
   name  = "${lookup(var.hosts[count.index], "hostname")}.${var.domain_name}"
@@ -72,7 +66,7 @@ resource "vultr_server" "hosts" {
   hostname           = "${lookup(var.hosts[count.index], "hostname")}.${var.domain_name}"
   ipv6               = true
   private_networking = false
-  ssh_key_ids        = ["${vultr_ssh_key.hosts.*.id}"]
+  ssh_key_ids        = ["${var.ssh_keys}"]
 }
 
 resource "null_resource" "tools" {
