@@ -100,6 +100,7 @@ resource "null_resource" "firewall" {
       "echo y | ufw reset && echo y | ufw enable",
       "ufw default deny incoming && ufw default allow outgoing",
       "ufw allow from any to ${element(vultr_server.hosts.*.ipv4_address, count.index)} port 22 proto tcp",
+      "ufw allow from any to ${element(vultr_server.hosts.*.ipv6_address, count.index)} port 22 proto tcp",
       "ufw logging on",
     ]
   }
