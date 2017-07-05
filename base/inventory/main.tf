@@ -106,6 +106,22 @@ resource "null_resource" "firewall" {
   }
 }
 
+resource "null_resource" "configure" {
+  count = "${length(var.hosts)}"
+
+  connection {
+    host = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
+    user = "root"
+    agent = true
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "passwd -d root",
+    ]
+  }
+}
+
 resource "dnsimple_record" "hostnames" {
   count  = "${length(var.hosts)}"
   domain = "${var.domain_name}"
