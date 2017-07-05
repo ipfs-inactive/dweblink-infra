@@ -49,3 +49,35 @@ module "nomad" {
   datacenters = "${module.inventory.datacenters}"
   roles = "${module.inventory.roles}"
 }
+
+module "bird" {
+  source = "./base/bird"
+
+  count = "${length(var.hosts)}"
+  connections = "${module.inventory.public_ipv4s}"
+  public_ipv4s = "${module.inventory.public_ipv4s}"
+  public_ipv6s = "${module.inventory.public_ipv6s}"
+  local_as = "${var.anycast_local_as}"
+  neighbor_as = "${var.anycast_neighbor_as}"
+  neighbor_ipv4 = "${var.anycast_neighbor_ipv4}"
+  neighbor_ipv6 = "${var.anycast_neighbor_ipv6}"
+  password = "${var.anycast_password}"
+}
+
+module "anycast_vpn" {
+  source = "../../ipfs/dweblink-infra/base/anycast"
+
+  count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn")))}"
+  connections = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn"))}"
+  name = "vpn"
+  addresses = "${var.anycast_addresses["vpn"]}"
+}
+
+module "anycast_lb" {
+  source = "../../ipfs/dweblink-infra/base/anycast"
+
+  count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("lb")))}"
+  connections = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("lb"))}"
+  name = "lb"
+  addresses = "${var.anycast_addresses["lb"]}"
+}
