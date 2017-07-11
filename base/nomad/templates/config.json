@@ -18,9 +18,9 @@
   "client": {
     "enabled": ${client},
     "options": {
-      "driver.whitelist": "${drivers}"
-    }
-    "node_class": "${node_class}",
-    "reserved": null,
+      "driver.whitelist": "${drivers}",
+      "docker.privileged.enabled": "${privileged}"
+    },
+    "node_class": "${node_class}"
   }
 }
