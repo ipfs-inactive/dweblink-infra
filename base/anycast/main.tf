@@ -18,7 +18,8 @@ resource "null_resource" "configure" {
   count = "${var.count}"
 
   triggers {
-    conns = "${join(",", var.connections)}"
+    count = "${var.count}"
+    conf = "${sha256(data.template_file.service.rendered)}"
   }
 
   connection {

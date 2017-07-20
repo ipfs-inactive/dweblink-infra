@@ -11,7 +11,7 @@ resource "null_resource" "install" {
 
   triggers {
     conf = "${sha256(file("${path.module}/templates/docker.default"))}"
-    conns = "${join(",", var.connections)}"
+    count = "${var.count}"
   }
 
   connection {
