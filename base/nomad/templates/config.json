@@ -21,6 +21,7 @@
       "driver.whitelist": "${drivers}",
       "docker.privileged.enabled": "${privileged}"
     },
+    "network_interface": "${interface}",
     "node_class": "${node_class}"
   }
 }

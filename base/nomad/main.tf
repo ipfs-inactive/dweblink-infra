@@ -22,6 +22,10 @@ variable "roles" {
   type = "list"
 }
 
+variable "bind_interfaces" {
+  default = ["lo", "lo0"]
+}
+
 variable "nomad_version" {
   type = "string"
 }
@@ -91,6 +95,7 @@ data "template_file" "config" {
     client = "true"
     drivers = "docker"
     privileged = "${element(var.roles, count.index) == "vpn" ? "true" : "false"}"
+    interface = "${join(" | ", var.bind_interfaces)}"
     node_class = "${element(var.roles, count.index)}"
     # TODO this is a mess :/ see https://github.com/hashicorp/terraform/issues/15291
     server = "${length(var.servers) == length(compact(split(",", replace(join(",", var.servers), element(var.private_ipv4s, count.index), "")))) ? "false" : "true"}"

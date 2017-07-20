@@ -57,6 +57,7 @@ module "nomad" {
   servers = "${var.coordinators}"
   datacenters = "${module.inventory.datacenters}"
   roles = "${module.inventory.roles}"
+  bind_interfaces = ["wg0"]
 }
 
 module "bird" {
