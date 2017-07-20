@@ -1,3 +1,12 @@
+data "template_file" "connections" {
+  count = "${length(var.hosts)}"
+  template = "$${address}"
+
+  vars {
+    address = "${var.use_public_ipv4s == true ? element(module.inventory.public_ipv4s, count.index) : element(module.inventory.private_ipv4s, count.index)}"
+  }
+}
+
 module "inventory" {
   source = "./base/inventory"
 
@@ -12,7 +21,7 @@ module "wireguard" {
   source = "./base/wireguard"
 
   count = "${length(var.hosts)}"
-  connections = "${module.inventory.public_ipv4s}"
+  connections = "${data.template_file.connections.*.rendered}"
   listen_addrs = "${module.inventory.public_ipv4s}"
   listen_port = 51820
   interface = "wg0"
@@ -23,7 +32,7 @@ module "docker" {
   source = "./base/docker"
 
   count = "${length(var.hosts)}"
-  connections = "${module.inventory.public_ipv4s}"
+  connections = "${data.template_file.connections.*.rendered}"
 }
 
 module "consul" {
@@ -31,7 +40,7 @@ module "consul" {
   depends_on = "${module.docker.dependency}"
 
   count = "${length(var.hosts)}"
-  connections = "${module.inventory.public_ipv4s}"
+  connections = "${data.template_file.connections.*.rendered}"
   private_ipv4s = "${module.wireguard.private_ipv4s}"
   docker_image = "consul:0.8.4"
   servers = "${var.coordinators}"
@@ -42,7 +51,7 @@ module "nomad" {
   source = "./base/nomad"
 
   count = "${length(var.hosts)}"
-  connections = "${module.inventory.public_ipv4s}"
+  connections = "${data.template_file.connections.*.rendered}"
   private_ipv4s = "${module.wireguard.private_ipv4s}"
   nomad_version = "0.5.6"
   servers = "${var.coordinators}"
@@ -54,7 +63,7 @@ module "bird" {
   source = "./base/bird"
 
   count = "${length(var.hosts)}"
-  connections = "${module.inventory.public_ipv4s}"
+  connections = "${data.template_file.connections.*.rendered}"
   public_ipv4s = "${module.inventory.public_ipv4s}"
   public_ipv6s = "${module.inventory.public_ipv6s}"
   local_as = "${var.anycast_local_as}"
@@ -68,7 +77,7 @@ module "anycast_vpn" {
   source = "../../ipfs/dweblink-infra/base/anycast"
 
   count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn")))}"
-  connections = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn"))}"
+  connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("vpn"))}"
   name = "vpn"
   addresses = "${var.anycast_addresses["vpn"]}"
 }
@@ -77,7 +86,7 @@ module "anycast_lb" {
   source = "../../ipfs/dweblink-infra/base/anycast"
 
   count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("lb")))}"
-  connections = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("lb"))}"
+  connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("lb"))}"
   name = "lb"
   addresses = "${var.anycast_addresses["lb"]}"
 }
