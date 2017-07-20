@@ -1,4 +1,5 @@
 secrets.tf
+secrets/
 .terraform
 
 # Compiled files
