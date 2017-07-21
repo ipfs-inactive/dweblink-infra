@@ -86,6 +86,7 @@ resource "null_resource" "tools" {
   }
 }
 
+# TODO instead of this, have a firewall module that pulls in rules from all other modules
 resource "null_resource" "firewall" {
   count = "${length(var.hosts)}"
 
@@ -170,6 +171,7 @@ output "datacenters" {
   value = ["${data.template_file.datacenters.*.rendered}"]
 }
 
+# TODO rename to class
 output "roles" {
   value = ["${data.template_file.roles.*.rendered}"]
 }
