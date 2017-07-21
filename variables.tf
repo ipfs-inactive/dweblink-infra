@@ -10,12 +10,39 @@ variable "hosts_tag" {
   default = "protocollabs"
 }
 
+variable "use_public_ipv4s" {
+  default = false
+}
+
+variable "private_network" {
+  default = "10.42.0.0/15"
+}
+
+variable "vpn_routes" {
+  default = "10.42.0.0/16"
+}
+
+variable "vpn_network" {
+  default = "10.43.0.0/16"
+}
+
+variable "vpn_data_dir" {
+  default = "/opt/openvpn-data/vpn.dweblink.net"
+}
+
+variable "vpn_data_src" {
+  default = "./secrets/openvpn-data"
+}
+
+data "external" "vpn_data_changed" {
+  program = ["sh", "-c", "jq -n --arg changed \"$(tar -c ./secrets/openvpn-data | sha256sum)\" '{\"changed\":$changed}'"]
+}
+
 variable "anycast_addresses" {
   default = {
     lb = ["198.51.233.233/32", "198.51.233.234/32",
           "2620:2:6000:26::26/64", "2620:2:6000:26::27/64"],
-    vpn = ["198.51.233.222/32",
-           "2620:2:6000:fed::222/64"],
+    vpn = ["198.51.233.222/32"],
   }
 }
 

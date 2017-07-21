@@ -26,6 +26,22 @@ module "wireguard" {
   listen_port = 51820
   interface = "wg0"
   private_ipv4s = "${module.inventory.private_ipv4s}"
+  private_network = "${var.private_network}"
+}
+
+module "openvpn" {
+  source = "./base/openvpn"
+
+  count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn")))}"
+  connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("vpn"))}"
+  domain_name = "vpn.${var.domain_name}"
+  network = "${var.vpn_network}"
+  routes = ["${var.vpn_routes}"]
+  data_dir = "${var.vpn_data_dir}"
+  data_src = "${path.module}/${var.vpn_data_src}"
+  data_changed = "${data.external.vpn_data_changed.result.changed}"
+  gateway_enabled = false
+  datacenters = "${distinct(module.inventory.datacenters)}"
 }
 
 module "docker" {
@@ -90,4 +106,18 @@ module "anycast_lb" {
   connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("lb"))}"
   name = "lb"
   addresses = "${var.anycast_addresses["lb"]}"
+}
+
+# TODO Revisit this once Nomad supports binding container ports to specific IPs.
+#      See https://github.com/hashicorp/nomad/issues/646#issuecomment-315416587
+module "portfwd_vpn" {
+  source = "./base/portfwd"
+
+  count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn")))}"
+  connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("vpn"))}"
+
+  port = 1194
+  from = "${concat(var.anycast_addresses["vpn"], list("$${public_ipv4}/32"))}"
+  to = "${matchkeys(module.inventory.private_ipv4s, module.inventory.roles, list("vpn"))}"
+  public_ipv4s = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn"))}"
 }

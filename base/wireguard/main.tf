@@ -22,6 +22,10 @@ variable "private_ipv4s" {
   type = "list"
 }
 
+variable "private_network" {
+  type = "string"
+}
+
 resource "null_resource" "wireguard" {
   count = "${var.count}"
 
@@ -68,7 +72,7 @@ resource "null_resource" "wireguard" {
       "systemctl is-enabled wireguard@${var.interface}.service || systemctl enable wireguard@${var.interface}.service",
       "systemctl restart wireguard@${var.interface}.service",
       "ufw allow from any to ${element(var.connections, count.index)} port ${var.listen_port} proto udp",
-      "ufw allow from 10.42.0.0/16",
+      "ufw allow from ${var.private_network}",
     ]
   }
 }
