@@ -35,7 +35,6 @@ resource "null_resource" "configure" {
 
   provisioner "remote-exec" {
     inline = [
-      "rm -vf /etc/systemd/system/anycast-lb.service",
       "systemctl daemon-reload",
       "systemctl is-enabled anycast-${var.name} || systemctl enable anycast-${var.name}",
       "systemctl is-active anycast-${var.name} || systemctl start anycast-${var.name}",
