@@ -1,0 +1,26 @@
+{
+  "data_dir": "/home/user/protocol/ipfs/dweblink-infra/tmp/nomad",
+  "addresses": {
+    "http": "127.0.0.1",
+    "rpc": "127.0.0.1",
+    "serf": "127.0.0.1"
+  },
+  "advertise": {
+    "http": "127.0.0.1:4646",
+    "rpc": "127.0.0.1:4647",
+    "serf": "127.0.0.1:4648"
+  },
+  "datacenter": "dc1",
+  "server": {
+    "enabled": true,
+    "bootstrap_expect": 1
+  },
+  "client": {
+    "enabled": true,
+    "options": {
+      "driver.whitelist": "docker",
+    },
+    "network_interface": "lo",
+    "node_class": "dev"
+  }
+}
