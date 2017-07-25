@@ -19,7 +19,10 @@ job "vpn" {
 
       config {
         image = "kylemanna/openvpn:2.4"
-        volumes = ["${data_dir}:/etc/openvpn"]
+        volumes = [
+          "${data_dir}:/etc/openvpn",
+          "${status_dir}:/tmp/openvpn"
+        ]
         # No capabilities support in nomad yet.
         privileged = true
         # I'm not sure the image can deal with host networking.

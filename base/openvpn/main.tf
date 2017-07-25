@@ -34,6 +34,10 @@ variable "port" {
   default = "1194"
 }
 
+variable "status_dir" {
+  default = "/opt/openvpn-status"
+}
+
 variable "gateway_enabled" {
   default = false
 }
@@ -176,6 +180,7 @@ data "template_file" "job" {
     datacenters = "${jsonencode(var.datacenters)}"
     count = "${var.count}"
     data_dir = "${var.data_dir}"
+    status_dir = "${var.status_dir}"
     port = "${var.port}"
   }
 }
