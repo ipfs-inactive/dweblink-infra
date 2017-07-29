@@ -34,6 +34,10 @@ variable "port" {
   default = "1194"
 }
 
+variable "exporter_port" {
+  default = "9176"
+}
+
 variable "status_dir" {
   default = "/opt/openvpn-status"
 }
@@ -182,6 +186,7 @@ data "template_file" "job" {
     data_dir = "${var.data_dir}"
     status_dir = "${var.status_dir}"
     port = "${var.port}"
+    exporter_port = "${var.exporter_port}"
   }
 }
 

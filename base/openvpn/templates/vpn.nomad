@@ -38,5 +38,28 @@ job "vpn" {
         }
       }
     }
+
+    task "openvpn_exporter" {
+      driver = "docker"
+
+      config {
+        image = "lgierth/openvpn_exporter:v0.2-5-g5c1e6df"
+        args = [
+          "-web.listen-address", ":${exporter_port}",
+          "-openvpn.status_paths", "/tmp/openvpn/status.log",
+        ]
+        volumes = [
+          "${status_dir}:/tmp/openvpn:ro"
+        ]
+      }
+
+      resources {
+        network {
+          port "openvpn_exporter" {
+            static = "${exporter_port}"
+          }
+        }
+      }
+    }
   }
 }
