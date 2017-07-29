@@ -2,7 +2,7 @@ job "vpn" {
   datacenters = ${datacenters}
   type = "service"
 
-  group "server" {
+  group "vpn" {
     count = ${count}
 
     constraint {
@@ -32,7 +32,7 @@ job "vpn" {
 
       resources {
         network {
-          port "ovpn" {
+          port "openvpn" {
             static = "${port}"
           }
         }

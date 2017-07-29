@@ -74,6 +74,7 @@ resource "null_resource" "data" {
 
   provisioner "remote-exec" {
     inline = [
+      "rm -rvf ${var.data_dir}/ccd",
       "chown -R root:root ${var.data_dir}",
     ]
   }
@@ -107,7 +108,6 @@ resource "null_resource" "config" {
 
   provisioner "remote-exec" {
     inline = [
-      "rm -rvf ${var.data_dir}/ccd",
       "ufw allow from any to any port ${var.port} proto udp",
     ]
   }
@@ -146,7 +146,7 @@ data "template_file" "config" {
   template = "${file("${path.module}/templates/openvpn.conf")}"
 
   vars {
-    network = "${cidrhost(cidrsubnet(var.network, 8, count.index), 0)}"
+    network = "${cidrhost(cidrsubnet(var.network, 8, count.index+1), 0)}"
     netmask = "${cidrnetmask(cidrsubnet(var.network, 8, count.index+1))}"
     push_routes = "${join("\n", data.template_file.routes.*.rendered)}"
     domain_name = "${var.domain_name}"
@@ -160,7 +160,7 @@ data "template_file" "env" {
   vars {
     domain_name = "${var.domain_name}"
     gateway_enabled = "${var.gateway_enabled == "1" ? "1" : "0"}"
-    network = "${cidrsubnet(var.network, 8, count.index)}"
+    network = "${cidrsubnet(var.network, 8, count.index + 1)}"
   }
 }
 
@@ -190,7 +190,7 @@ data "template_file" "routes" {
   template = "push \"route $${addr} $${mask}\""
 
   vars {
-    addr = "${cidrhost(element(var.routes, count.index), 0)}"
+    addr = "${cidrhost(element(var.routes, count.index+1), 0)}"
     mask = "${cidrnetmask(element(var.routes, count.index))}"
   }
 }
