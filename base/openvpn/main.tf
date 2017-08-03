@@ -26,6 +26,14 @@ variable "network" {
   type = "string"
 }
 
+variable "ipv6_networks" {
+  type = "list"
+}
+
+variable "ndp_networks" {
+  type = "list"
+}
+
 variable "routes" {
   default = []
 }
@@ -91,6 +99,7 @@ resource "null_resource" "config" {
   triggers {
     conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
     env = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
+    ndppd = "${sha256(element(data.template_file.ndppd.*.rendered, count.index))}"
     count = "${var.count}"
   }
 
@@ -98,6 +107,18 @@ resource "null_resource" "config" {
     host  = "${element(var.connections, count.index)}"
     user  = "root"
     agent = true
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "rm -rvf /opt/ndppd",
+      "mkdir /opt/ndppd"
+    ]
+  }
+
+  provisioner "file" {
+    content = "${element(data.template_file.ndppd.*.rendered, count.index)}"
+    destination = "/opt/ndppd/ndppd.conf"
   }
 
   provisioner "file" {
@@ -123,6 +144,7 @@ resource "null_resource" "job" {
   triggers {
     conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
     env = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
+    ndppd = "${sha256(element(data.template_file.ndppd.*.rendered, count.index))}"
     job = "${sha256(data.template_file.job.rendered)}"
   }
 
@@ -152,6 +174,7 @@ data "template_file" "config" {
   vars {
     network = "${cidrhost(cidrsubnet(var.network, 8, count.index+1), 0)}"
     netmask = "${cidrnetmask(cidrsubnet(var.network, 8, count.index+1))}"
+    ipv6_network = "${cidrhost(element(var.ipv6_networks, count.index), 1)}/112"
     push_routes = "${join("\n", data.template_file.routes.*.rendered)}"
     domain_name = "${var.domain_name}"
   }
@@ -177,6 +200,15 @@ data "template_file" "firewall" {
   }
 }
 
+data "template_file" "ndppd" {
+  count = "${var.count}"
+  template = "${file("${path.module}/templates/ndppd.conf")}"
+
+  vars {
+    network = "${element(var.ndp_networks, count.index)}"
+  }
+}
+
 data "template_file" "job" {
   template = "${file("${path.module}/templates/vpn.nomad")}"
 
@@ -185,6 +217,8 @@ data "template_file" "job" {
     count = "${var.count}"
     data_dir = "${var.data_dir}"
     status_dir = "${var.status_dir}"
+    mac_address = "42:00:00:00:00:00"
+    ipv6_network = "${element(var.ndp_networks, count.index)}"
     port = "${var.port}"
     exporter_port = "${var.exporter_port}"
   }

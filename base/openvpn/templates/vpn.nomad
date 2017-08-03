@@ -4,6 +4,10 @@ job "vpn" {
 
   group "vpn" {
     count = ${count}
+    restart {
+      mode = "delay"
+      delay = "15s"
+    }
 
     constraint {
       distinct_hosts = true
@@ -28,6 +32,7 @@ job "vpn" {
         # I'm not sure the image can deal with host networking.
         # The iptables rules seem to get lost.
         #network_mode = "host"
+        mac_address = "${mac_address}"
       }
 
       resources {
@@ -36,6 +41,28 @@ job "vpn" {
             static = "${port}"
           }
         }
+      }
+    }
+
+    task "ndppd" {
+      driver = "docker"
+
+      config {
+        image = "ajacques/ndppd"
+        privileged = true
+        network_mode = "host"
+        command = "/usr/local/sbin/ndppd"
+        args = [
+          "-c", "/ndppd/ndppd.conf",
+        ]
+        volumes = [
+          "/opt/ndppd:/ndppd:ro"
+        ]
+      }
+
+      env {
+        INTERFACE = "ens3"
+        SUBNET_ADDR = "${ipv6_network}"
       }
     }
 

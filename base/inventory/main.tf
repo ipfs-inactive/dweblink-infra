@@ -167,6 +167,10 @@ output "public_ipv6s" {
   value = ["${vultr_server.hosts.*.ipv6_address}"]
 }
 
+output "public_ipv6_networks" {
+  value = ["${formatlist("%s/64", vultr_server.hosts.*.ipv6_network)}"]
+}
+
 output "datacenters" {
   value = ["${data.template_file.datacenters.*.rendered}"]
 }

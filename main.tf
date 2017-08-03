@@ -36,6 +36,8 @@ module "openvpn" {
   connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("vpn"))}"
   domain_name = "vpn.${var.domain_name}"
   network = "${var.vpn_network}"
+  ipv6_networks = "${matchkeys(data.template_file.vpn_ipv6_networks.*.rendered, module.inventory.roles, list("vpn"))}"
+  ndp_networks = "${matchkeys(module.inventory.public_ipv6_networks, module.inventory.roles, list("vpn"))}"
   routes = ["${var.vpn_routes}"]
   data_dir = "${var.vpn_data_dir}"
   data_src = "${path.module}/${var.vpn_data_src}"

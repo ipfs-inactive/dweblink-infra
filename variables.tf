@@ -18,12 +18,32 @@ variable "private_network" {
   default = "10.42.0.0/15"
 }
 
+data "template_file" "docker_ipv6_networks" {
+  count = "${length(var.hosts)}"
+  template = "$${address}"
+
+  vars {
+    # 65535 = 0xffff
+    address = "${cidrsubnet(element(module.inventory.public_ipv6_networks, count.index), 16, 65535)}"
+  }
+}
+
 variable "vpn_routes" {
   default = "10.42.0.0/16"
 }
 
 variable "vpn_network" {
   default = "10.43.0.0/16"
+}
+
+data "template_file" "vpn_ipv6_networks" {
+  count = "${length(var.hosts)}"
+  template = "$${address}"
+
+  vars {
+    # 16777026 = 0xffff42, range within docker_ipv6_networks
+    address = "${cidrsubnet(element(module.inventory.public_ipv6_networks, count.index), 24, 16777026)}"
+  }
 }
 
 variable "vpn_data_dir" {
