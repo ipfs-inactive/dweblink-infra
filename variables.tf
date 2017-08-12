@@ -62,13 +62,17 @@ variable "anycast_neighbor_ipv6" {
   default = "2001:19f0:ffff::1"
 }
 
-# TODO: instead: matchkeys(inv.private_ipv4s, inv.classes, "cluster")
-variable "coordinators" {
-  default = [
-    "10.42.1.1",
-    "10.42.2.1",
-    "10.42.3.1",
-  ]
+variable "cluster_leader_role" {
+  default = "co"
+}
+
+data "template_file" "cluster_leaders" {
+  count = "${length(matchkeys(module.inventory.private_ipv4s, module.inventory.roles, list(var.cluster_leader_role)))}"
+  template = "$${address}"
+
+  vars {
+    address = "${element(matchkeys(module.inventory.private_ipv4s, module.inventory.roles, list(var.cluster_leader_role)), count.index)}"
+  }
 }
 
 variable "hosts" {

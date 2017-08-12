@@ -59,7 +59,7 @@ module "consul" {
   connections = "${data.template_file.connections.*.rendered}"
   private_ipv4s = "${module.wireguard.private_ipv4s}"
   docker_image = "consul:0.8.4"
-  servers = "${var.coordinators}"
+  servers = "${data.template_file.cluster_leaders.*.rendered}"
   datacenters = "${module.inventory.datacenters}"
 }
 
@@ -70,7 +70,7 @@ module "nomad" {
   connections = "${data.template_file.connections.*.rendered}"
   private_ipv4s = "${module.wireguard.private_ipv4s}"
   nomad_version = "0.5.6"
-  servers = "${var.coordinators}"
+  servers = "${data.template_file.cluster_leaders.*.rendered}"
   datacenters = "${module.inventory.datacenters}"
   roles = "${module.inventory.roles}"
   bind_interfaces = ["wg0"]
