@@ -1,36 +1,36 @@
 variable "dc2region" {
   default = {
-    ewr = 1,
-    ord = 2,
-    dfw = 3,
-    sea = 4,
-    lax = 5,
-    atl = 6,
-    ams = 7,
-    lhr = 8,
-    fra = 9,
-    sjc = 12,
-    syd = 19,
-    cdg = 24,
-    nrt = 25,
-    sgp = 40,
-    mia = 39,
+    ewr = 1
+    ord = 2
+    dfw = 3
+    sea = 4
+    lax = 5
+    atl = 6
+    ams = 7
+    lhr = 8
+    fra = 9
+    sjc = 12
+    syd = 19
+    cdg = 24
+    nrt = 25
+    sgp = 40
+    mia = 39
   }
 }
 
 variable "size2plan" {
   default = {
-    "1cpu1gb" = 201,
-    "1cpu2gb" = 202,
-    "2cpu4gb" = 203,
-    "4cpu8gb" = 204,
+    "1cpu1gb" = 201
+    "1cpu2gb" = 202
+    "2cpu4gb" = 203
+    "4cpu8gb" = 204
   }
 }
 
 variable "image2os" {
   default = {
-    ubuntu1604 = 215,
-    windows2016 = 240,
+    ubuntu1604  = 215
+    windows2016 = 240
   }
 }
 
@@ -69,8 +69,8 @@ resource "null_resource" "tools" {
   count = "${length(var.hosts)}"
 
   connection {
-    host = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
-    user = "root"
+    host  = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
+    user  = "root"
     agent = true
   }
 
@@ -87,8 +87,8 @@ resource "null_resource" "firewall" {
   count = "${length(var.hosts)}"
 
   connection {
-    host = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
-    user = "root"
+    host  = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
+    user  = "root"
     agent = true
   }
 
@@ -108,8 +108,8 @@ resource "null_resource" "configure" {
   count = "${length(var.hosts)}"
 
   connection {
-    host = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
-    user = "root"
+    host  = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
+    user  = "root"
     agent = true
   }
 
@@ -123,14 +123,14 @@ resource "null_resource" "configure" {
 resource "dnsimple_record" "hostnames" {
   count  = "${length(var.hosts)}"
   domain = "${var.domain_name}"
-  name  = "${lookup(var.hosts[count.index], "name")}"
-  value = "${lookup(var.hosts[count.index], "ipv4")}"
-  type  = "A"
-  ttl   = "60"
+  name   = "${lookup(var.hosts[count.index], "name")}"
+  value  = "${lookup(var.hosts[count.index], "ipv4")}"
+  type   = "A"
+  ttl    = "60"
 }
 
 data "template_file" "datacenters" {
-  count = "${length(var.hosts)}"
+  count    = "${length(var.hosts)}"
   template = "$${dc}"
 
   vars {
@@ -139,7 +139,7 @@ data "template_file" "datacenters" {
 }
 
 data "template_file" "roles" {
-  count = "${length(var.hosts)}"
+  count    = "${length(var.hosts)}"
   template = "$${role}"
 
   vars {

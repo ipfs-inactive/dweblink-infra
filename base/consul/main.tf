@@ -42,14 +42,14 @@ resource "null_resource" "install" {
   count = "${var.count}"
 
   triggers {
-    conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
-    docker = "${var.docker_image} ${var.docker_opts}"
+    conf       = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
+    docker     = "${var.docker_image} ${var.docker_opts}"
     depends_on = "${var.depends_on}"
   }
 
   connection {
-    host = "${element(var.connections, count.index)}"
-    user = "root"
+    host  = "${element(var.connections, count.index)}"
+    user  = "root"
     agent = true
   }
 
@@ -60,7 +60,7 @@ resource "null_resource" "install" {
   }
 
   provisioner "file" {
-    content = "${element(data.template_file.config.*.rendered, count.index)}"
+    content     = "${element(data.template_file.config.*.rendered, count.index)}"
     destination = "${var.config_dir}/consul.json"
   }
 
@@ -73,15 +73,16 @@ resource "null_resource" "install" {
 }
 
 data "template_file" "config" {
-  count = "${var.count}"
+  count    = "${var.count}"
   template = "${file("${path.module}/templates/config.json")}"
 
   vars {
-    bind = "${element(var.ipv4s, count.index)}",
+    bind       = "${element(var.ipv4s, count.index)}"
     datacenter = "${element(var.datacenters, count.index)}"
     retry_join = "${join("\", \"", var.servers)}"
+
     # TODO this is a mess :/ see https://github.com/hashicorp/terraform/issues/15291
-    server = "${length(var.servers) == length(compact(split(",", replace(join(",", var.servers), element(var.ipv4s, count.index), "")))) ? "false" : "true"}"
+    server           = "${length(var.servers) == length(compact(split(",", replace(join(",", var.servers), element(var.ipv4s, count.index), "")))) ? "false" : "true"}"
     bootstrap_expect = "${length(var.servers) == length(compact(split(",", replace(join(",", var.servers), element(var.ipv4s, count.index), "")))) ? 0 : floor(length(var.servers)/2)+1}"
   }
 }

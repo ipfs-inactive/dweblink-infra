@@ -10,18 +10,18 @@ resource "null_resource" "install" {
   count = "${var.count}"
 
   triggers {
-    conf = "${sha256(file("${path.module}/templates/docker.default"))}"
+    conf  = "${sha256(file("${path.module}/templates/docker.default"))}"
     count = "${var.count}"
   }
 
   connection {
-    host = "${element(var.connections, count.index)}"
-    user = "root"
+    host  = "${element(var.connections, count.index)}"
+    user  = "root"
     agent = true
   }
 
   provisioner "file" {
-    source = "${path.module}/templates/docker.default"
+    source      = "${path.module}/templates/docker.default"
     destination = "/etc/default/docker"
   }
 

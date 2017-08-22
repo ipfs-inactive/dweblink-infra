@@ -33,6 +33,7 @@ resource "null_resource" "wireguard" {
     # TODO this generates new keys everytime :/
     # interface_conf = "${join("\n\n", data.template_file.interface.*.rendered)}"
     count = "${var.count}"
+
     conf = "${var.interface}${var.listen_port}${var.network}"
   }
 

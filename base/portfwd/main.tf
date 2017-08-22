@@ -37,7 +37,7 @@ resource "null_resource" "install" {
   }
 
   provisioner "file" {
-    content = "${element(data.template_file.rules.*.rendered, count.index)}"
+    content     = "${element(data.template_file.rules.*.rendered, count.index)}"
     destination = "/etc/ufw/before.rules.portfwd"
   }
 
@@ -45,13 +45,14 @@ resource "null_resource" "install" {
     inline = [
       "cd /etc/ufw ; if ! cat before.rules.portfwd-orig >/dev/null; then cp before.rules before.rules.portfwd-orig; fi",
       "cd /etc/ufw ; cat before.rules.portfwd before.rules.portfwd-orig > before.rules",
-      "ufw reload"
+      "ufw reload",
     ]
   }
 }
 
 data "template_file" "rules" {
   count = "${var.count}"
+
   template = <<EOF
 *nat
 :PREROUTING ACCEPT [0:0]
@@ -60,8 +61,8 @@ COMMIT
 EOF
 
   vars {
-    to = "${element(var.to, count.index)}"
-    port = "${var.port}"
+    to          = "${element(var.to, count.index)}"
+    port        = "${var.port}"
     public_ipv4 = "${element(var.public_ipv4s, count.index)}"
   }
 }

@@ -19,17 +19,17 @@ resource "null_resource" "configure" {
 
   triggers {
     count = "${var.count}"
-    conf = "${sha256(data.template_file.service.rendered)}"
+    conf  = "${sha256(data.template_file.service.rendered)}"
   }
 
   connection {
-    host = "${element(var.connections, count.index)}"
-    user = "root"
+    host  = "${element(var.connections, count.index)}"
+    user  = "root"
     agent = true
   }
 
   provisioner "file" {
-    content = "${data.template_file.service.rendered}"
+    content     = "${data.template_file.service.rendered}"
     destination = "/etc/systemd/system/anycast-${var.name}.service"
   }
 
@@ -46,7 +46,7 @@ data "template_file" "service" {
   template = "${file("${path.module}/templates/anycast.service.tpl")}"
 
   vars {
-    name = "${var.name}"
+    name      = "${var.name}"
     addresses = "ExecStart=/sbin/ip addr add ${join(" dev dummy-${var.name}\nExecStart=/sbin/ip addr add ", var.addresses)} dev dummy-${var.name}"
   }
 }

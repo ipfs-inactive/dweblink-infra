@@ -51,12 +51,12 @@ resource "null_resource" "install" {
 
   triggers {
     version = "${var.bird_version}"
-    count = "${var.count}"
+    count   = "${var.count}"
   }
 
   connection {
-    host = "${element(var.connections, count.index)}"
-    user = "root"
+    host  = "${element(var.connections, count.index)}"
+    user  = "root"
     agent = true
   }
 
@@ -78,40 +78,40 @@ resource "null_resource" "install" {
 }
 
 resource "null_resource" "configure" {
-  count = "${var.count}"
+  count      = "${var.count}"
   depends_on = ["null_resource.install"]
 
   triggers {
     count = "${var.count}"
-    svc = "${sha256(file("${path.module}/templates/bird.service"))}"
-    svc6 = "${sha256(file("${path.module}/templates/bird6.service"))}"
-    conf = "${sha256(join("\n", data.template_file.bird_conf.*.rendered))}"
+    svc   = "${sha256(file("${path.module}/templates/bird.service"))}"
+    svc6  = "${sha256(file("${path.module}/templates/bird6.service"))}"
+    conf  = "${sha256(join("\n", data.template_file.bird_conf.*.rendered))}"
     conf6 = "${sha256(join("\n", data.template_file.bird6_conf.*.rendered))}"
   }
 
   connection {
-    host = "${element(var.connections, count.index)}"
-    user = "root"
+    host  = "${element(var.connections, count.index)}"
+    user  = "root"
     agent = true
   }
 
   provisioner "file" {
-    source = "${path.module}/templates/bird.service"
+    source      = "${path.module}/templates/bird.service"
     destination = "/etc/systemd/system/bird.service"
   }
 
   provisioner "file" {
-    source = "${path.module}/templates/bird6.service"
+    source      = "${path.module}/templates/bird6.service"
     destination = "/etc/systemd/system/bird6.service"
   }
 
   provisioner "file" {
-    content = "${element(data.template_file.bird_conf.*.rendered, count.index)}"
+    content     = "${element(data.template_file.bird_conf.*.rendered, count.index)}"
     destination = "/etc/bird.conf"
   }
 
   provisioner "file" {
-    content = "${element(data.template_file.bird6_conf.*.rendered, count.index)}"
+    content     = "${element(data.template_file.bird6_conf.*.rendered, count.index)}"
     destination = "/etc/bird6.conf"
   }
 
@@ -131,31 +131,31 @@ resource "null_resource" "configure" {
 }
 
 data "template_file" "bird_conf" {
-  count = "${var.count}"
+  count    = "${var.count}"
   template = "${file("${path.module}/templates/bird.conf.tpl")}"
 
   vars {
-    router_id = "${element(var.public_ipv4s, count.index)}"
-    local_as = "${var.local_as}"
-    source_address = "${element(var.public_ipv4s, count.index)}"
-    neighbor_address = "${var.neighbor_ipv4}"
-    neighbor_as = "${var.neighbor_as}"
+    router_id         = "${element(var.public_ipv4s, count.index)}"
+    local_as          = "${var.local_as}"
+    source_address    = "${element(var.public_ipv4s, count.index)}"
+    neighbor_address  = "${var.neighbor_ipv4}"
+    neighbor_as       = "${var.neighbor_as}"
     neighbor_password = "${var.neighbor_password}"
-    interface = "dummy*"
+    interface         = "dummy*"
   }
 }
 
 data "template_file" "bird6_conf" {
-  count = "${var.count}"
+  count    = "${var.count}"
   template = "${file("${path.module}/templates/bird.conf.tpl")}"
 
   vars {
-    router_id = "${element(var.public_ipv4s, count.index)}"
-    local_as = "${var.local_as}"
-    source_address = "${element(var.public_ipv6s, count.index)}"
-    neighbor_address = "${var.neighbor_ipv6}"
-    neighbor_as = "${var.neighbor_as}"
+    router_id         = "${element(var.public_ipv4s, count.index)}"
+    local_as          = "${var.local_as}"
+    source_address    = "${element(var.public_ipv6s, count.index)}"
+    neighbor_address  = "${var.neighbor_ipv6}"
+    neighbor_as       = "${var.neighbor_as}"
     neighbor_password = "${var.neighbor_password}"
-    interface = "dummy*"
+    interface         = "dummy*"
   }
 }

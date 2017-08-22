@@ -56,7 +56,7 @@ resource "null_resource" "data" {
   count = "${var.count}"
 
   triggers {
-    data = "${var.data_changed}"
+    data  = "${var.data_changed}"
     count = "${var.count}"
   }
 
@@ -74,7 +74,7 @@ resource "null_resource" "data" {
   }
 
   provisioner "file" {
-    source = "${var.data}/"
+    source      = "${var.data}/"
     destination = "${var.data_dir}"
   }
 
@@ -87,12 +87,12 @@ resource "null_resource" "data" {
 }
 
 resource "null_resource" "config" {
-  count = "${var.count}"
+  count      = "${var.count}"
   depends_on = ["null_resource.data"]
 
   triggers {
-    conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
-    env = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
+    conf  = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
+    env   = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
     count = "${var.count}"
   }
 
@@ -103,12 +103,12 @@ resource "null_resource" "config" {
   }
 
   provisioner "file" {
-    content = "${element(data.template_file.config.*.rendered, count.index)}"
+    content     = "${element(data.template_file.config.*.rendered, count.index)}"
     destination = "${var.data_dir}/openvpn.conf"
   }
 
   provisioner "file" {
-    content = "${element(data.template_file.env.*.rendered, count.index)}"
+    content     = "${element(data.template_file.env.*.rendered, count.index)}"
     destination = "${var.data_dir}/ovpn_env.sh"
   }
 
@@ -124,8 +124,8 @@ resource "null_resource" "job" {
 
   triggers {
     conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
-    env = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
-    job = "${sha256(data.template_file.job.rendered)}"
+    env  = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
+    job  = "${sha256(data.template_file.job.rendered)}"
   }
 
   connection {
@@ -135,7 +135,7 @@ resource "null_resource" "job" {
   }
 
   provisioner "file" {
-    content = "${data.template_file.job.rendered}"
+    content     = "${data.template_file.job.rendered}"
     destination = "/opt/vpn.nomad"
   }
 
@@ -148,25 +148,25 @@ resource "null_resource" "job" {
 }
 
 data "template_file" "config" {
-  count = "${var.count}"
+  count    = "${var.count}"
   template = "${file("${path.module}/templates/openvpn.conf")}"
 
   vars {
-    network = "${cidrhost(cidrsubnet(var.network, 8, count.index+1), 0)}"
-    netmask = "${cidrnetmask(cidrsubnet(var.network, 8, count.index+1))}"
+    network     = "${cidrhost(cidrsubnet(var.network, 8, count.index+1), 0)}"
+    netmask     = "${cidrnetmask(cidrsubnet(var.network, 8, count.index+1))}"
     push_routes = "${join("\n", data.template_file.routes.*.rendered)}"
     domain_name = "${var.domain_name}"
   }
 }
 
 data "template_file" "env" {
-  count = "${var.count}"
+  count    = "${var.count}"
   template = "${file("${path.module}/templates/ovpn_env.sh")}"
 
   vars {
-    domain_name = "${var.domain_name}"
+    domain_name     = "${var.domain_name}"
     gateway_enabled = "${var.gateway_enabled == "1" ? "1" : "0"}"
-    network = "${cidrsubnet(var.network, 8, count.index + 1)}"
+    network         = "${cidrsubnet(var.network, 8, count.index + 1)}"
   }
 }
 
@@ -183,17 +183,17 @@ data "template_file" "job" {
   template = "${file("${path.module}/templates/vpn.nomad")}"
 
   vars {
-    datacenters = "${jsonencode(var.datacenters)}"
-    count = "${var.count}"
-    data_dir = "${var.data_dir}"
-    status_dir = "${var.status_dir}"
-    port = "${var.port}"
+    datacenters   = "${jsonencode(var.datacenters)}"
+    count         = "${var.count}"
+    data_dir      = "${var.data_dir}"
+    status_dir    = "${var.status_dir}"
+    port          = "${var.port}"
     exporter_port = "${var.exporter_port}"
   }
 }
 
 data "template_file" "routes" {
-  count = "${length(var.routes)}"
+  count    = "${length(var.routes)}"
   template = "push \"route $${addr} $${mask}\""
 
   vars {
