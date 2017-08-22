@@ -6,7 +6,7 @@ variable "connections" {
   type = "list"
 }
 
-variable "private_ipv4s" {
+variable "ipv4s" {
   type = "list"
 }
 
@@ -71,7 +71,6 @@ resource "null_resource" "install" {
 
   provisioner "remote-exec" {
     inline = [
-      "DEBIAN_FRONTEND=noninteractive apt-get install -yq ethtool",
       "rm -rf /tmp/nomad*",
       "cd /tmp && wget https://releases.hashicorp.com/nomad/${var.nomad_version}/nomad_${var.nomad_version}_linux_amd64.zip && unzip nomad_${var.nomad_version}_linux_amd64.zip",
       "mv /tmp/nomad /usr/local/bin/",
@@ -89,8 +88,8 @@ data "template_file" "config" {
   vars {
     data_dir = "${var.data_dir}"
     http_address = "127.0.0.1"
-    rpc_address = "${element(var.private_ipv4s, count.index)}",
-    serf_address = "${element(var.private_ipv4s, count.index)}",
+    rpc_address = "${element(var.ipv4s, count.index)}",
+    serf_address = "${element(var.ipv4s, count.index)}",
     datacenter = "${element(var.datacenters, count.index)}"
     client = "true"
     drivers = "docker"
@@ -98,8 +97,8 @@ data "template_file" "config" {
     interface = "${join(" | ", var.bind_interfaces)}"
     node_class = "${element(var.roles, count.index)}"
     # TODO this is a mess :/ see https://github.com/hashicorp/terraform/issues/15291
-    server = "${length(var.servers) == length(compact(split(",", replace(join(",", var.servers), element(var.private_ipv4s, count.index), "")))) ? "false" : "true"}"
-    bootstrap_expect = "${length(var.servers) == length(compact(split(",", replace(join(",", var.servers), element(var.private_ipv4s, count.index), "")))) ? 0 : floor(length(var.servers)/2)+1}"
+    server = "${length(var.servers) == length(compact(split(",", replace(join(",", var.servers), element(var.ipv4s, count.index), "")))) ? "false" : "true"}"
+    bootstrap_expect = "${length(var.servers) == length(compact(split(",", replace(join(",", var.servers), element(var.ipv4s, count.index), "")))) ? 0 : floor(length(var.servers)/2)+1}"
     retry_join = "${join("\", \"", var.servers)}"
   }
 }

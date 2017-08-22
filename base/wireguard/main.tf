@@ -18,11 +18,11 @@ variable "interface" {
   default = "wg0"
 }
 
-variable "private_ipv4s" {
+variable "ipv4s" {
   type = "list"
 }
 
-variable "private_network" {
+variable "network" {
   type = "string"
 }
 
@@ -33,7 +33,7 @@ resource "null_resource" "wireguard" {
     # TODO this generates new keys everytime :/
     # interface_conf = "${join("\n\n", data.template_file.interface.*.rendered)}"
     count = "${var.count}"
-    conf = "${var.interface}${var.listen_port}${var.private_network}"
+    conf = "${var.interface}${var.listen_port}${var.network}"
   }
 
   connection {
@@ -72,7 +72,7 @@ resource "null_resource" "wireguard" {
       "systemctl is-enabled wireguard@${var.interface}.service || systemctl enable wireguard@${var.interface}.service",
       "systemctl restart wireguard@${var.interface}.service",
       "ufw allow from any to ${element(var.connections, count.index)} port ${var.listen_port} proto udp",
-      "ufw allow from ${var.private_network}",
+      "ufw allow from ${var.network}",
     ]
   }
 }
@@ -82,7 +82,7 @@ data "template_file" "interface" {
   template = "${file("${path.module}/templates/interface.conf")}"
 
   vars {
-    address     = "${element(var.private_ipv4s, count.index)}"
+    address     = "${element(var.ipv4s, count.index)}"
     port        = "${var.listen_port}"
     private_key = "${element(data.external.keys.*.result.private_key, count.index)}"
     peers       = "${replace(join("\n", data.template_file.peers.*.rendered), element(data.template_file.peers.*.rendered, count.index), "")}"
@@ -96,7 +96,7 @@ data "template_file" "peers" {
   vars {
     endpoint    = "${format("%s:%s", element(var.listen_addrs, count.index), var.listen_port)}"
     public_key  = "${element(data.external.keys.*.result.public_key, count.index)}"
-    allowed_ips = "${format("%s/32", element(var.private_ipv4s, count.index))}"
+    allowed_ips = "${format("%s/32", element(var.ipv4s, count.index))}"
   }
 }
 
@@ -106,8 +106,8 @@ data "external" "keys" {
   program = ["sh", "${path.module}/scripts/gen_keys.sh"]
 }
 
-output "private_ipv4s" {
-  value = ["${var.private_ipv4s}"]
+output "ipv4s" {
+  value = ["${var.ipv4s}"]
 }
 
 output "vpn_unit" {

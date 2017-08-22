@@ -47,23 +47,19 @@ variable "domain_name" {
 }
 
 variable "image" {
-  type = "string"
-}
-
-variable "tag" {
-  type = "string"
+  default = "ubuntu1604"
 }
 
 resource "vultr_server" "hosts" {
   count = "${length(var.hosts)}"
-  name  = "${lookup(var.hosts[count.index], "hostname")}.${var.domain_name}"
-  tag   = "${var.tag}"
+  name  = "${lookup(var.hosts[count.index], "name")}.${var.domain_name}"
+  tag   = "protocollabs"
 
   region_id = "${var.dc2region[lookup(var.hosts[count.index], "dc")]}"
   plan_id   = "${var.size2plan[lookup(var.hosts[count.index], "size")]}"
   os_id     = "${var.image2os[var.image]}"
 
-  hostname           = "${lookup(var.hosts[count.index], "hostname")}.${var.domain_name}"
+  hostname           = "${lookup(var.hosts[count.index], "name")}.${var.domain_name}"
   ipv6               = true
   private_networking = false
   ssh_key_ids        = ["${var.ssh_keys}"]
@@ -127,8 +123,8 @@ resource "null_resource" "configure" {
 resource "dnsimple_record" "hostnames" {
   count  = "${length(var.hosts)}"
   domain = "${var.domain_name}"
-  name  = "${lookup(var.hosts[count.index], "hostname")}"
-  value = "${lookup(var.hosts[count.index], "private_ipv4")}"
+  name  = "${lookup(var.hosts[count.index], "name")}"
+  value = "${lookup(var.hosts[count.index], "ipv4")}"
   type  = "A"
   ttl   = "60"
 }
@@ -155,7 +151,7 @@ output "hostnames" {
   value = ["${vultr_server.hosts.*.name}"]
 }
 
-output "private_ipv4s" {
+output "ipv4s" {
   value = ["${dnsimple_record.hostnames.*.value}"]
 }
 

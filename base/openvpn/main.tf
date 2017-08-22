@@ -1,3 +1,5 @@
+# the vpn shit -- need to allow from 172.17.0.0/24 or so
+
 variable "count" {
   type = "string"
 }
@@ -7,10 +9,10 @@ variable "connections" {
 }
 
 variable "data_dir" {
-  type = "string"
+  default = "/opt/openvpn-data"
 }
 
-variable "data_src" {
+variable "data" {
   type = "string"
 }
 
@@ -72,7 +74,7 @@ resource "null_resource" "data" {
   }
 
   provisioner "file" {
-    source = "${var.data_src}/"
+    source = "${var.data}/"
     destination = "${var.data_dir}"
   }
 
@@ -118,7 +120,7 @@ resource "null_resource" "config" {
 }
 
 resource "null_resource" "job" {
-  depends_on = ["null_resource.config"]
+  depends_on = ["null_resource.data", "null_resource.config"]
 
   triggers {
     conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"

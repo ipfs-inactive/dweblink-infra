@@ -31,18 +31,18 @@ variable "local_as" {
 }
 
 variable "neighbor_as" {
-  type = "string"
+  default = "64515"
 }
 
 variable "neighbor_ipv4" {
-  type = "string"
+  default = "169.254.169.254"
 }
 
 variable "neighbor_ipv6" {
-  type = "string"
+  default = "2001:19f0:ffff::1"
 }
 
-variable "password" {
+variable "neighbor_password" {
   type = "string"
 }
 
@@ -140,7 +140,7 @@ data "template_file" "bird_conf" {
     source_address = "${element(var.public_ipv4s, count.index)}"
     neighbor_address = "${var.neighbor_ipv4}"
     neighbor_as = "${var.neighbor_as}"
-    password = "${var.password}"
+    neighbor_password = "${var.neighbor_password}"
     interface = "dummy*"
   }
 }
@@ -155,7 +155,7 @@ data "template_file" "bird6_conf" {
     source_address = "${element(var.public_ipv6s, count.index)}"
     neighbor_address = "${var.neighbor_ipv6}"
     neighbor_as = "${var.neighbor_as}"
-    password = "${var.password}"
+    neighbor_password = "${var.neighbor_password}"
     interface = "dummy*"
   }
 }

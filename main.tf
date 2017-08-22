@@ -1,9 +1,13 @@
+variable "bootstrap" {
+  default = false
+}
+
 data "template_file" "connections" {
   count = "${length(var.hosts)}"
   template = "$${address}"
 
   vars {
-    address = "${var.use_public_ipv4s == true ? element(module.inventory.public_ipv4s, count.index) : element(module.inventory.private_ipv4s, count.index)}"
+    address = "${var.bootstrap == true ? element(module.inventory.public_ipv4s, count.index) : element(module.inventory.ipv4s, count.index)}"
   }
 }
 
@@ -13,8 +17,6 @@ module "inventory" {
   hosts = "${var.hosts}"
   ssh_keys = "${var.ssh_keys}"
   domain_name = "${var.domain_name}"
-  image = "${var.image}"
-  tag = "${var.hosts_tag}"
 }
 
 module "wireguard" {
@@ -25,20 +27,19 @@ module "wireguard" {
   listen_addrs = "${module.inventory.public_ipv4s}"
   listen_port = 51820
   interface = "wg0"
-  private_ipv4s = "${module.inventory.private_ipv4s}"
-  private_network = "${var.private_network}"
+  ipv4s = "${module.inventory.ipv4s}"
+  network = "${var.network}"
 }
 
 module "openvpn" {
   source = "./base/openvpn"
 
-  count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn")))}"
+  count = "${length(matchkeys(module.inventory.ipv4s, module.inventory.roles, list("vpn")))}"
   connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("vpn"))}"
   domain_name = "vpn.${var.domain_name}"
-  network = "${var.vpn_network}"
-  routes = ["${var.vpn_routes}"]
-  data_dir = "${var.vpn_data_dir}"
-  data_src = "${path.module}/${var.vpn_data_src}"
+  network = "${cidrsubnet(var.network, 1, 1)}"
+  routes = ["${cidrsubnet(var.network, 1, 0)}"]
+  data = "${path.module}/${var.vpn_data}"
   data_changed = "${data.external.vpn_data_changed.result.changed}"
   gateway_enabled = false
   datacenters = "${distinct(module.inventory.datacenters)}"
@@ -57,7 +58,7 @@ module "consul" {
 
   count = "${length(var.hosts)}"
   connections = "${data.template_file.connections.*.rendered}"
-  private_ipv4s = "${module.wireguard.private_ipv4s}"
+  ipv4s = "${module.wireguard.ipv4s}"
   docker_image = "consul:0.8.4"
   servers = "${data.template_file.cluster_leaders.*.rendered}"
   datacenters = "${module.inventory.datacenters}"
@@ -68,7 +69,7 @@ module "nomad" {
 
   count = "${length(var.hosts)}"
   connections = "${data.template_file.connections.*.rendered}"
-  private_ipv4s = "${module.wireguard.private_ipv4s}"
+  ipv4s = "${module.wireguard.ipv4s}"
   nomad_version = "0.5.6"
   servers = "${data.template_file.cluster_leaders.*.rendered}"
   datacenters = "${module.inventory.datacenters}"
@@ -84,10 +85,7 @@ module "bird" {
   public_ipv4s = "${module.inventory.public_ipv4s}"
   public_ipv6s = "${module.inventory.public_ipv6s}"
   local_as = "${var.anycast_local_as}"
-  neighbor_as = "${var.anycast_neighbor_as}"
-  neighbor_ipv4 = "${var.anycast_neighbor_ipv4}"
-  neighbor_ipv6 = "${var.anycast_neighbor_ipv6}"
-  password = "${var.anycast_password}"
+  neighbor_password = "${var.anycast_password}"
 }
 
 module "anycast_vpn" {
@@ -118,6 +116,6 @@ module "portfwd_vpn" {
 
   port = 1194
   from = "${concat(var.anycast_addresses["vpn"], list("$${public_ipv4}/32"))}"
-  to = "${matchkeys(module.inventory.private_ipv4s, module.inventory.roles, list("vpn"))}"
+  to = "${matchkeys(module.inventory.ipv4s, module.inventory.roles, list("vpn"))}"
   public_ipv4s = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn"))}"
 }

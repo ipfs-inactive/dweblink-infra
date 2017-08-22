@@ -10,7 +10,7 @@ protocol bgp vultr {
   graceful restart on;
   multihop 2;
   neighbor ${neighbor_address} as ${neighbor_as};
-  password "${password}";
+  password "${neighbor_password}";
 }
 
 protocol device {
