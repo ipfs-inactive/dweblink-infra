@@ -10,6 +10,9 @@
     "rpc": "${rpc_address}:4647",
     "serf": "${serf_address}:4648"
   },
+  "consul": {
+    "address": "${consul_address}:8500"
+  },
   "datacenter": "${datacenter}",
   "server": {
     "enabled": ${server},

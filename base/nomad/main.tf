@@ -91,6 +91,7 @@ data "template_file" "config" {
     http_address = "127.0.0.1"
     rpc_address  = "${element(var.ipv4s, count.index)}"
     serf_address = "${element(var.ipv4s, count.index)}"
+    consul_address = "${element(var.ipv4s, count.index)}"
     datacenter   = "${element(var.datacenters, count.index)}"
     client       = "true"
     drivers      = "docker"
