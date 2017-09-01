@@ -172,6 +172,13 @@ variable "hosts" {
       size = "2cpu4gb"
       role = "co"
     },
+    {
+      name = "gw0.fra"
+      ipv4 = "10.42.2.10"
+      dc   = "fra"
+      size = "2cpu4gb"
+      role = "gw"
+    },
   ]
 }
 
