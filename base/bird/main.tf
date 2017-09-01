@@ -51,7 +51,6 @@ resource "null_resource" "install" {
 
   triggers {
     version = "${var.bird_version}"
-    count   = "${var.count}"
   }
 
   connection {
@@ -82,7 +81,6 @@ resource "null_resource" "configure" {
   depends_on = ["null_resource.install"]
 
   triggers {
-    count = "${var.count}"
     svc   = "${sha256(file("${path.module}/templates/bird.service"))}"
     svc6  = "${sha256(file("${path.module}/templates/bird6.service"))}"
     conf  = "${sha256(join("\n", data.template_file.bird_conf.*.rendered))}"

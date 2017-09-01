@@ -32,9 +32,8 @@ resource "null_resource" "wireguard" {
   triggers {
     # TODO this generates new keys everytime :/
     # interface_conf = "${join("\n\n", data.template_file.interface.*.rendered)}"
-    count = "${var.count}"
 
-    conf = "${var.interface}${var.listen_port}${var.network}"
+    conf = "${var.interface},${var.listen_port},${var.network},${join(",", var.ipv4s)}"
   }
 
   connection {
