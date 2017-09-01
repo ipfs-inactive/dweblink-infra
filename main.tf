@@ -59,7 +59,7 @@ module "consul" {
   count        = "${length(var.hosts)}"
   connections  = "${data.template_file.connections.*.rendered}"
   ipv4s        = "${module.wireguard.ipv4s}"
-  docker_image = "consul:0.8.4"
+  docker_image = "consul:0.9.2"
   servers      = "${data.template_file.cluster_leaders.*.rendered}"
   datacenters  = "${module.inventory.datacenters}"
 }
