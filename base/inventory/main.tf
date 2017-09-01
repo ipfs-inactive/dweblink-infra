@@ -72,6 +72,7 @@ resource "null_resource" "tools" {
     host  = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
     user  = "root"
     agent = true
+    timeout = "30s"
   }
 
   provisioner "remote-exec" {
@@ -90,6 +91,7 @@ resource "null_resource" "firewall" {
     host  = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
     user  = "root"
     agent = true
+    timeout = "30s"
   }
 
   provisioner "remote-exec" {
@@ -111,6 +113,7 @@ resource "null_resource" "configure" {
     host  = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
     user  = "root"
     agent = true
+    timeout = "30s"
   }
 
   provisioner "remote-exec" {

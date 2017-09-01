@@ -64,6 +64,7 @@ resource "null_resource" "data" {
     host  = "${element(var.connections, count.index)}"
     user  = "root"
     agent = true
+    timeout = "30s"
   }
 
   provisioner "remote-exec" {
@@ -100,6 +101,7 @@ resource "null_resource" "config" {
     host  = "${element(var.connections, count.index)}"
     user  = "root"
     agent = true
+    timeout = "30s"
   }
 
   provisioner "file" {
@@ -132,6 +134,7 @@ resource "null_resource" "job" {
     host  = "${element(var.connections, 0)}"
     user  = "root"
     agent = true
+    timeout = "30s"
   }
 
   provisioner "file" {

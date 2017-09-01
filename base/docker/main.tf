@@ -18,6 +18,7 @@ resource "null_resource" "install" {
     host  = "${element(var.connections, count.index)}"
     user  = "root"
     agent = true
+    timeout = "30s"
   }
 
   provisioner "file" {
