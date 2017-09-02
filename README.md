@@ -57,6 +57,24 @@ A: use 8.8.8.8, or configure dnsmasq with `domain-rebind-ok=/dweblink.net/` (/et
 - terraform apply -parallelism=1
 - for s in $(terraform state list | grep vultr_server); do terraform state show "$s" | grep -P 'ipv4_address|hostname'; echo ---; done
 
+---
+
+- use terraform 0.10.2 for now
+- https://github.com/gruntwork-io/terragrunt
+- https://news.ycombinator.com/item?id=14539814
+- https://blog.gruntwork.io/how-to-use-terraform-as-a-team-251bc1104973
+
+---
+
+networking issues
+- remote state is over vpn, so it's tricky to do changes that interrupt vpn connectivity (e.g. openvpn module)
+  - make it so bootstrap mode fixes that, e.g. when bootstrap then use local state only
+- each consul agent (:8500) is exposed to the whole vpn
+- containers can access vpn through host
+- ssh (:22) is publicly exposed
+- each module does its own firewall setup (ufw) so the inventory module can overwrite others
+  - could have firewall module which grabs rules from each module and applies them
+
 
 ## OpenVPN notes
 
