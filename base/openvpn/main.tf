@@ -92,6 +92,7 @@ resource "null_resource" "config" {
   depends_on = ["null_resource.data"]
 
   triggers {
+    data  = "${var.data_changed}"
     conf  = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
     env   = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
     count = "${var.count}"
@@ -125,6 +126,7 @@ resource "null_resource" "job" {
   depends_on = ["null_resource.data", "null_resource.config"]
 
   triggers {
+    data = "${var.data_changed}"
     conf = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
     env  = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
     job  = "${sha256(data.template_file.job.rendered)}"
