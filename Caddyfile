@@ -1,0 +1,14 @@
+* {
+  prometheus ${bind_metrics}:9180
+
+  tls hostmaster@ipfs.io {
+    storage consul
+    max_certs 10
+  }
+
+  proxy / ${upstream} {
+
+  }
+}
+
+# figure out rewrite

@@ -89,7 +89,7 @@ module "bird" {
 }
 
 module "anycast_vpn" {
-  source = "../../ipfs/dweblink-infra/base/anycast"
+  source = "./base/anycast"
 
   count       = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn")))}"
   connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("vpn"))}"
@@ -97,8 +97,22 @@ module "anycast_vpn" {
   addresses   = "${var.anycast_addresses["vpn"]}"
 }
 
+# TODO Revisit this once Nomad supports binding container ports to specific IPs.
+#      See https://github.com/hashicorp/nomad/issues/646#issuecomment-315416587
+module "portfwd_vpn" {
+  source = "./base/portfwd"
+
+  count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn")))}"
+  connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("vpn"))}"
+
+  port = 1194
+  from = "${concat(var.anycast_addresses["vpn"], list("$${public_ipv4}/32"))}"
+  to = "${matchkeys(module.inventory.private_ipv4s, module.inventory.roles, list("vpn"))}"
+  public_ipv4s = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn"))}"
+}
+
 module "anycast_lb" {
-  source = "../../ipfs/dweblink-infra/base/anycast"
+  source = "./base/anycast"
 
   count       = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("lb")))}"
   connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("lb"))}"
@@ -118,4 +132,20 @@ module "portfwd_vpn" {
   from         = "${concat(var.anycast_addresses["vpn"], list("$${public_ipv4}/32"))}"
   to           = "${matchkeys(module.inventory.ipv4s, module.inventory.roles, list("vpn"))}"
   public_ipv4s = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn"))}"
+}
+
+module "ipfs" {
+  source = "./gateway/ipfs"
+
+  count = "${length(matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("lb")))}"
+  connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("lb"))}"
+  datacenters = "${distinct(module.inventory.datacenters)}"
+
+  image = "ipfs/go-ipfs"
+  version = "v0.4.10"
+  repo_dir = "/opt/ipfs"
+  swarm_tcp_port = "4001"
+  swarm_ws_port = "4002"
+  api_port = "5001"
+  gateway_port = "8080"
 }
