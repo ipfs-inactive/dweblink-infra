@@ -8,14 +8,6 @@ variable "network" {
   default = "10.42.0.0/15"
 }
 
-variable "ssh_keys" {
-  default = [
-    "57d1b92cd1edd",
-    "5956dc8a4967d",
-    "5956dcad57069",
-  ]
-}
-
 variable "hosts" {
   default = [
     {

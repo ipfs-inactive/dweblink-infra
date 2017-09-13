@@ -14,9 +14,10 @@ data "template_file" "connections" {
 module "inventory" {
   source = "./base/inventory"
 
-  hosts       = "${var.hosts}"
-  ssh_keys    = "${var.ssh_keys}"
-  domain_name = "${var.domain_name}"
+  hosts          = "${var.hosts}"
+  vultr_ssh_keys = "${var.vultr_ssh_keys}"
+  ssh_keys       = "${var.ssh_keys}"
+  domain_name    = "${var.domain_name}"
 }
 
 module "wireguard" {
