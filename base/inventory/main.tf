@@ -38,6 +38,10 @@ variable "hosts" {
   type = "list"
 }
 
+variable "vultr_ssh_keys" {
+  type = "list"
+}
+
 variable "ssh_keys" {
   type = "list"
 }
@@ -62,7 +66,7 @@ resource "vultr_server" "hosts" {
   hostname           = "${lookup(var.hosts[count.index], "name")}.${var.domain_name}"
   ipv6               = true
   private_networking = false
-  ssh_key_ids        = ["${var.ssh_keys}"]
+  ssh_key_ids        = ["${var.vultr_ssh_keys}"]
 }
 
 resource "null_resource" "tools" {
@@ -109,6 +113,10 @@ resource "null_resource" "firewall" {
 resource "null_resource" "configure" {
   count = "${length(var.hosts)}"
 
+  triggers {
+    keys = "${join(",", var.ssh_keys)}"
+  }
+
   connection {
     host  = "${element(vultr_server.hosts.*.ipv4_address, count.index)}"
     user  = "root"
@@ -120,6 +128,11 @@ resource "null_resource" "configure" {
     inline = [
       "passwd -d root",
     ]
+  }
+
+  provisioner "file" {
+    content = "${join("\n", var.ssh_keys)}\n"
+    destination = "/root/.ssh/authorized_keys"
   }
 }
 
