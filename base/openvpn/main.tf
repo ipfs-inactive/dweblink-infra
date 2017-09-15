@@ -57,7 +57,6 @@ resource "null_resource" "data" {
 
   triggers {
     data  = "${var.data_changed}"
-    count = "${var.count}"
   }
 
   connection {
@@ -95,7 +94,6 @@ resource "null_resource" "config" {
     data  = "${var.data_changed}"
     conf  = "${sha256(element(data.template_file.config.*.rendered, count.index))}"
     env   = "${sha256(element(data.template_file.env.*.rendered, count.index))}"
-    count = "${var.count}"
   }
 
   connection {
