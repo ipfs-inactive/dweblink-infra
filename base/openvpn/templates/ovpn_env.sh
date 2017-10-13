@@ -20,9 +20,8 @@ declare -x OVPN_ROUTES
 declare -x OVPN_SERVER="${network}"
 declare -x OVPN_SERVER_URL="udp://${domain_name}"
 declare -x OVPN_TLS_CIPHER="TLS-ECDHE-RSA-WITH-AES-128-GCM-SHA256:TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256:TLS-ECDHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA256"
-declare -x OVPN_ADDITIONAL_CLIENT_CONFIG="
-script-security 1
-persist-tun
-tls-version-min 1.2
-verify-x509-name 'CN=${domain_name}' subject
-remote-cert-eku 'TLS Web Server Authentication'"
+OVPN_EXTRA_CLIENT_CONFIG+=("script-security 1")
+OVPN_EXTRA_CLIENT_CONFIG+=("persist-tun")
+OVPN_EXTRA_CLIENT_CONFIG+=("tls-version-min 1.2")
+OVPN_EXTRA_CLIENT_CONFIG+=("verify-x509-name 'CN=${domain_name}' subject")
+OVPN_EXTRA_CLIENT_CONFIG+=("remote-cert-eku 'TLS Web Server Authentication'")
