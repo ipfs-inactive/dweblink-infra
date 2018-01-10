@@ -44,6 +44,7 @@ module "openvpn" {
   data_changed    = "${data.external.vpn_data_changed.result.changed}"
   gateway_enabled = false
   datacenters     = "${distinct(module.inventory.datacenters)}"
+  public_ipv6     = "${element(split("/", element(var.anycast_addresses["vpn"], 1)), 0)}"
 }
 
 module "docker" {
@@ -116,7 +117,7 @@ module "portfwd_vpn" {
   connections = "${matchkeys(data.template_file.connections.*.rendered, module.inventory.roles, list("vpn"))}"
 
   port         = 1194
-  from         = "${concat(var.anycast_addresses["vpn"], list("$${public_ipv4}/32"))}"
+  from         = "${concat(list(element(var.anycast_addresses["vpn"], 0)), list("$${public_ipv4}/32"))}"
   to           = "${matchkeys(module.inventory.ipv4s, module.inventory.roles, list("vpn"))}"
   public_ipv4s = "${matchkeys(module.inventory.public_ipv4s, module.inventory.roles, list("vpn"))}"
 }

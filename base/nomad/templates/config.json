@@ -21,7 +21,8 @@
   "client": {
     "enabled": ${client},
     "options": {
-      "driver.whitelist": "${drivers}",
+      "driver.whitelist": "docker,raw_exec",
+      "driver.raw_exec.enable": "1",
       "docker.privileged.enabled": "${privileged}"
     },
     "network_interface": "${interface}",

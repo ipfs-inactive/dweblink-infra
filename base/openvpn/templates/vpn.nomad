@@ -39,6 +39,15 @@ job "vpn" {
       }
     }
 
+    task "openvpn_udp6" {
+      driver = "raw_exec"
+
+      config {
+        command = "/usr/bin/socat"
+        args = ["UDP6-LISTEN:1194,bind=[${public_ipv6}],fork", "UDP4:$${NOMAD_ADDR_openvpn_openvpn}"]
+      }
+    }
+
     task "openvpn_exporter" {
       driver = "docker"
 

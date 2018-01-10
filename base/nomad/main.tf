@@ -94,7 +94,6 @@ data "template_file" "config" {
     consul_address = "${element(var.ipv4s, count.index)}"
     datacenter   = "${element(var.datacenters, count.index)}"
     client       = "true"
-    drivers      = "docker"
     privileged   = "${element(var.roles, count.index) == "vpn" ? "true" : "false"}"
     interface    = "${join(" | ", var.bind_interfaces)}"
     node_class   = "${element(var.roles, count.index)}"

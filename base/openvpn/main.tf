@@ -36,6 +36,10 @@ variable "port" {
   default = "1194"
 }
 
+variable "public_ipv6" {
+  type = "string"
+}
+
 variable "exporter_port" {
   default = "9176"
 }
@@ -192,6 +196,7 @@ data "template_file" "job" {
     status_dir    = "${var.status_dir}"
     port          = "${var.port}"
     exporter_port = "${var.exporter_port}"
+    public_ipv6   = "${var.public_ipv6}"
   }
 }
 

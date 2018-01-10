@@ -38,7 +38,7 @@ resource "null_resource" "configure" {
     inline = [
       "systemctl daemon-reload",
       "systemctl is-enabled anycast-${var.name} || systemctl enable anycast-${var.name}",
-      "systemctl is-active anycast-${var.name} || systemctl start anycast-${var.name}",
+      "systemctl restart anycast-${var.name}",
     ]
   }
 }
