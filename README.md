@@ -1,3 +1,5 @@
+[DEPRECATED]
+
 # dweblink-infra
 
 > Infrastructure for the dweb.link IPFS gateway
