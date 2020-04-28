@@ -1,6 +1,7 @@
-[DEPRECATED]
+# Deprecated
+This work is deprecated, and this repo has been archived.
 
-# dweblink-infra
+## dweblink-infra
 
 > Infrastructure for the dweb.link IPFS gateway
 
