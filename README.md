@@ -41,6 +41,35 @@ This work is deprecated, and this repo has been archived.
   - [ ] ipfs-cluster
   - [ ] pinbot
 
+## Getting started
+
+### Requirements
+
+- Wireguard (Software: `wireguard-dkms wireguard-tools` from `ppa:wireguard/wireguard`)
+- Terraform version 0.10.2
+- Vultr Plugin for Terraform (https://github.com/elricsfate/terraform-provider-vultr)
+- VPN connection to vpn.dweblink.net
+
+To confirm your VPN connection is working, ping co0.ams.dweblink.net. If it responds, you're OK!
+
+You'll need a `~/.terraformrc` file with the following contents:
+
+```
+providers {
+  vultr = "/home/victor/bin/terraform-provider-vultr"
+}
+```
+
+### First steps
+
+* Initialize the terraform state
+  * `terraform init`
+* Make sure code and state are in sync
+  * `terraform plan`
+
+The plan should (if everything is correct) be unchanged and print `No changes. Infrastructure is up-to-date.`
+
+If not, something in the setup or deployed environment is different. Open a issue!
 
 ## FAQ
 
